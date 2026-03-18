@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>迷路から逃げろ</title>
+<title>鬼ごっこ迷路</title>
 <style>
 body{
 margin:0;
@@ -21,8 +21,8 @@ margin-top:20px;
 
 .cell{
 position:absolute;
-width:40px;
-height:40px;
+width:50px;
+height:50px;
 }
 
 .wall{background:#000}
@@ -47,28 +47,24 @@ margin:10px;
 </head>
 <body>
 
-<h1>鬼から逃げてゴールせよ</h1>
-<button onclick="startGame()">START</button>
+<h1>鬼から逃げろ</h1>
+<button onclick="start()">START</button>
 <div id="game"></div>
 
 <script>
-
 let maze=[
-[1,1,1,1,1,1,1,1,1,1,1,1],
-[1,0,0,0,1,0,0,0,0,0,0,1],
-[1,0,1,0,1,0,1,1,1,1,0,1],
-[1,0,1,0,0,0,0,0,1,0,0,1],
-[1,0,1,1,1,1,1,0,1,0,1,1],
-[1,0,0,0,0,0,1,0,1,0,0,1],
-[1,1,1,1,1,0,1,0,1,1,0,1],
-[1,0,0,0,1,0,0,0,0,1,0,1],
-[1,0,1,0,1,1,1,1,0,1,0,1],
-[1,0,1,0,0,0,0,1,0,0,0,1],
-[1,0,0,0,1,1,0,0,0,1,0,1],
-[1,1,1,1,1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1,1],
+[1,0,0,0,1,0,0,0,1],
+[1,0,1,0,1,0,1,0,1],
+[1,0,1,0,0,0,1,0,1],
+[1,0,1,1,1,0,1,0,1],
+[1,0,0,0,1,0,0,0,1],
+[1,1,1,0,1,1,1,0,1],
+[1,0,0,0,0,0,0,0,1],
+[1,1,1,1,1,1,1,1,1],
 ]
 
-let size=40
+let size=50
 let game=document.getElementById("game")
 game.style.width=maze[0].length*size+"px"
 game.style.height=maze.length*size+"px"
@@ -84,8 +80,8 @@ game.appendChild(d)
 }
 
 let player={x:1,y:1}
-let enemy={x:10,y:10}
-let goal={x:10,y:1}
+let enemy={x:7,y:7}
+let goal={x:7,y:1}
 
 let p=document.createElement("div")
 p.id="player"
@@ -99,23 +95,23 @@ let g=document.createElement("div")
 g.id="goal"
 game.appendChild(g)
 
-let gameStarted=false
+let started=false
 
 function draw(){
-p.style.left=player.x*size+5+"px"
-p.style.top=player.y*size+5+"px"
-e.style.left=enemy.x*size+5+"px"
-e.style.top=enemy.y*size+5+"px"
-g.style.left=goal.x*size+5+"px"
-g.style.top=goal.y*size+5+"px"
+p.style.left=player.x*size+10+"px"
+p.style.top=player.y*size+10+"px"
+e.style.left=enemy.x*size+10+"px"
+e.style.top=enemy.y*size+10+"px"
+g.style.left=goal.x*size+10+"px"
+g.style.top=goal.y*size+10+"px"
 }
 
-document.addEventListener("keydown",e=>{
+document.addEventListener("keydown",ev=>{
 let dx=0,dy=0
-if(e.key=="ArrowUp")dy=-1
-if(e.key=="ArrowDown")dy=1
-if(e.key=="ArrowLeft")dx=-1
-if(e.key=="ArrowRight")dx=1
+if(ev.key=="ArrowUp")dy=-1
+if(ev.key=="ArrowDown")dy=1
+if(ev.key=="ArrowLeft")dx=-1
+if(ev.key=="ArrowRight")dx=1
 
 if(!maze[player.y+dy][player.x+dx]){
 player.x+=dx
@@ -125,35 +121,32 @@ check()
 }
 })
 
-function enemyAI(){
-if(!gameStarted)return
+function chase(){
+if(!started)return
 
-let dirs=[[1,0],[-1,0],[0,1],[0,-1]]
-let best=[0,0]
-let bestDist=999
+let dx=player.x-enemy.x
+let dy=player.y-enemy.y
 
-for(let d of dirs){
-let nx=enemy.x+d[0]
-let ny=enemy.y+d[1]
-if(!maze[ny][nx]){
-let dist=Math.abs(player.x-nx)+Math.abs(player.y-ny)
-if(dist<bestDist){
-bestDist=dist
-best=d
+if(Math.abs(dx)>Math.abs(dy)){
+if(dx>0 && !maze[enemy.y][enemy.x+1])enemy.x++
+else if(dx<0 && !maze[enemy.y][enemy.x-1])enemy.x--
+}else{
+if(dy>0 && !maze[enemy.y+1][enemy.x])enemy.y++
+else if(dy<0 && !maze[enemy.y-1][enemy.x])enemy.y--
 }
-}
-}
-
-enemy.x+=best[0]
-enemy.y+=best[1]
 
 draw()
 check()
 }
 
-function startGame(){
-gameStarted=true
-setInterval(enemyAI,300)
+function start(){
+alert("3")
+setTimeout(()=>alert("2"),500)
+setTimeout(()=>alert("1"),1000)
+setTimeout(()=>{
+started=true
+setInterval(chase,300)
+},1500)
 }
 
 function check(){
@@ -162,7 +155,7 @@ alert("捕まった")
 location.reload()
 }
 if(player.x==goal.x && player.y==goal.y){
-alert("クリア！！")
+alert("クリア")
 location.reload()
 }
 }
