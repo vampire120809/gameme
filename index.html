@@ -2,141 +2,122 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>鬼ごっこ迷路</title>
+<title>迷路鬼ごっこ</title>
 <style>
-body{
-    margin:0;
-    background:#111;
-    overflow:hidden;
-    font-family:sans-serif;
-}
-.wall{
-    position:absolute;
-    background:#555;
-}
-#player{
-    width:35px;
-    height:35px;
-    background:cyan;
-    position:absolute;
-}
-#enemy{
-    width:35px;
-    height:35px;
-    background:red;
-    position:absolute;
-}
-#goal{
-    width:40px;
-    height:40px;
-    background:lime;
-    position:absolute;
-}
-#ui{
-    position:fixed;
-    color:white;
-    font-size:20px;
-    left:10px;
-    top:10px;
-}
-button{
-    position:fixed;
-    bottom:20px;
-    font-size:30px;
-}
-#left{left:20px;}
-#right{left:120px;}
-#up{right:120px;}
-#down{right:20px;}
+body{margin:0;background:#111;overflow:hidden}
+.cell{position:absolute;width:40px;height:40px}
+.wall{background:#333}
+.path{background:#eee}
+#player{width:30px;height:30px;background:cyan;position:absolute}
+#enemy{width:30px;height:30px;background:red;position:absolute}
+#goal{width:30px;height:30px;background:lime;position:absolute}
 </style>
 </head>
 <body>
-
-<div id="ui">スタート→ゴールへ逃げろ！</div>
 
 <div id="player"></div>
 <div id="enemy"></div>
 <div id="goal"></div>
 
-<!-- 壁 -->
-<div class="wall" style="left:100px;top:0;width:20px;height:400px;"></div>
-<div class="wall" style="left:200px;top:200px;width:20px;height:400px;"></div>
-<div class="wall" style="left:300px;top:0;width:20px;height:400px;"></div>
-<div class="wall" style="left:400px;top:200px;width:20px;height:400px;"></div>
-
-<button id="left">←</button>
-<button id="right">→</button>
-<button id="up">↑</button>
-<button id="down">↓</button>
-
 <script>
-let player = document.getElementById("player");
-let enemy = document.getElementById("enemy");
-let goal = document.getElementById("goal");
+let maze=[
+[1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,1,0,0,0,0,1],
+[1,0,1,0,1,0,1,1,0,1],
+[1,0,1,0,0,0,0,1,0,1],
+[1,0,1,1,1,1,0,1,0,1],
+[1,0,0,0,0,1,0,1,0,1],
+[1,1,1,1,0,1,0,1,0,1],
+[1,0,0,1,0,0,0,1,0,1],
+[1,0,0,0,0,1,0,0,0,1],
+[1,1,1,1,1,1,1,1,1,1],
+]
 
-let px = 20;
-let py = 20;
+let size=40
+let player={x:1,y:1}
+let enemy={x:8,y:8}
+let goal={x:8,y:1}
 
-let ex = 450;
-let ey = 350;
-
-goal.style.left = "500px";
-goal.style.top = "50px";
-
-let speed = 5;
-let enemySpeed = 2;
-
-let walls = document.querySelectorAll(".wall");
-
-function hitWall(x,y){
-    for(let w of walls){
-        let r = w.getBoundingClientRect();
-        if(x < r.right && x+35 > r.left && y < r.bottom && y+35 > r.top){
-            return true;
-        }
-    }
-    return false;
+function drawMaze(){
+for(let y=0;y<maze.length;y++){
+for(let x=0;x<maze[y].length;x++){
+let d=document.createElement("div")
+d.className="cell "+(maze[y][x]?"wall":"path")
+d.style.left=x*size+"px"
+d.style.top=y*size+"px"
+document.body.appendChild(d)
+}
+}
 }
 
-function move(dx,dy){
-    if(!hitWall(px+dx,py)) px += dx;
-    if(!hitWall(px,py+dy)) py += dy;
+drawMaze()
+
+let p=document.getElementById("player")
+let e=document.getElementById("enemy")
+let g=document.getElementById("goal")
+
+function draw(){
+p.style.left=player.x*size+5+"px"
+p.style.top=player.y*size+5+"px"
+e.style.left=enemy.x*size+5+"px"
+e.style.top=enemy.y*size+5+"px"
+g.style.left=goal.x*size+5+"px"
+g.style.top=goal.y*size+5+"px"
 }
 
-document.getElementById("left").onclick=()=>move(-speed,0);
-document.getElementById("right").onclick=()=>move(speed,0);
-document.getElementById("up").onclick=()=>move(0,-speed);
-document.getElementById("down").onclick=()=>move(0,speed);
-
-function game(){
-    let dx = px - ex;
-    let dy = py - ey;
-    let dist = Math.sqrt(dx*dx + dy*dy);
-
-    ex += dx/dist * enemySpeed;
-    ey += dy/dist * enemySpeed;
-
-    player.style.left = px + "px";
-    player.style.top = py + "px";
-    enemy.style.left = ex + "px";
-    enemy.style.top = ey + "px";
-
-    let g = goal.getBoundingClientRect();
-    if(px < g.right && px+35 > g.left && py < g.bottom && py+35 > g.top){
-        alert("クリア！！！");
-        location.reload();
-    }
-
-    if(dist < 30){
-        alert("捕まった！");
-        location.reload();
-    }
-
-    requestAnimationFrame(game);
+document.addEventListener("keydown",ev=>{
+let dx=0,dy=0
+if(ev.key=="ArrowUp")dy=-1
+if(ev.key=="ArrowDown")dy=1
+if(ev.key=="ArrowLeft")dx=-1
+if(ev.key=="ArrowRight")dx=1
+if(!maze[player.y+dy][player.x+dx]){
+player.x+=dx
+player.y+=dy
 }
-game();
+})
+
+function enemyMove(){
+let dirs=[[1,0],[-1,0],[0,1],[0,-1]]
+let best=[0,0]
+let bestDist=999
+
+for(let d of dirs){
+let nx=enemy.x+d[0]
+let ny=enemy.y+d[1]
+if(!maze[ny][nx]){
+let dist=Math.abs(player.x-nx)+Math.abs(player.y-ny)
+if(dist<bestDist){
+bestDist=dist
+best=d
+}
+}
+}
+
+enemy.x+=best[0]
+enemy.y+=best[1]
+}
+
+function loop(){
+enemyMove()
+draw()
+
+if(player.x==enemy.x && player.y==enemy.y){
+alert("捕まった！")
+location.reload()
+}
+
+if(player.x==goal.x && player.y==goal.y){
+alert("クリア！！")
+location.reload()
+}
+
+setTimeout(loop,300)
+}
+
+draw()
+loop()
 </script>
 
 </body>
 </html>
-
