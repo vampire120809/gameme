@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>迷路鬼ごっこ</title>
+<title>ガチ迷路鬼ごっこ</title>
 <style>
 body{
 margin:0;
@@ -13,22 +13,15 @@ align-items:center;
 color:white;
 font-family:sans-serif;
 }
-#game{
-position:relative;
-margin-top:20px;
-}
-.cell{
-position:absolute;
-width:60px;
-height:60px;
-}
-.wall{background:black}
-.path{background:white}
+#game{position:relative;margin-top:20px}
+.cell{position:absolute;width:50px;height:50px}
+.wall{background:#000}
+.path{background:#eee}
 
 #player,#enemy,#goal{
 position:absolute;
-width:40px;
-height:40px;
+width:30px;
+height:30px;
 border-radius:50%;
 }
 
@@ -36,22 +29,15 @@ border-radius:50%;
 #enemy{background:red}
 #goal{background:gold}
 
-.controls{
-margin-top:20px;
-}
-
-button{
-font-size:30px;
-margin:5px;
-}
+button{font-size:30px;margin:5px}
 </style>
 </head>
 <body>
 
-<h1>鬼に捕まる前にゴールしろ</h1>
+<h1>迷路をクリアせよ</h1>
 <div id="game"></div>
 
-<div class="controls">
+<div>
 <button onclick="move(0,-1)">↑</button><br>
 <button onclick="move(-1,0)">←</button>
 <button onclick="move(1,0)">→</button><br>
@@ -60,17 +46,20 @@ margin:5px;
 
 <script>
 let maze=[
-[1,1,1,1,1,1,1,1],
-[1,0,0,0,0,0,0,1],
-[1,0,1,1,1,1,0,1],
-[1,0,1,0,0,1,0,1],
-[1,0,1,0,0,1,0,1],
-[1,0,1,1,1,1,0,1],
-[1,0,0,0,0,0,0,1],
-[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1,1,1,1],
+[1,0,0,1,0,0,0,0,0,0,1],
+[1,0,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,0,1,0,0,1,0,1],
+[1,1,1,1,0,1,0,1,1,0,1],
+[1,0,0,1,0,0,0,1,0,0,1],
+[1,0,1,1,1,1,0,1,0,1,1],
+[1,0,0,0,0,1,0,0,0,0,1],
+[1,1,1,1,0,1,1,1,1,0,1],
+[1,0,0,0,0,0,0,0,1,0,1],
+[1,1,1,1,1,1,1,1,1,1,1],
 ]
 
-let size=60
+let size=50
 let game=document.getElementById("game")
 game.style.width=maze[0].length*size+"px"
 game.style.height=maze.length*size+"px"
@@ -86,8 +75,8 @@ game.appendChild(d)
 }
 
 let player={x:1,y:1}
-let enemy={x:6,y:6}
-let goal={x:6,y:1}
+let enemy={x:9,y:9}
+let goal={x:9,y:1}
 
 let p=document.createElement("div")
 p.id="player"
