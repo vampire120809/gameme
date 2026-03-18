@@ -2,86 +2,141 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>鬼ごっこゲーム</title>
+<title>鬼ごっこ迷路</title>
 <style>
 body{
     margin:0;
+    background:#111;
     overflow:hidden;
-    background:#222;
+    font-family:sans-serif;
+}
+.wall{
+    position:absolute;
+    background:#555;
 }
 #player{
-    width:40px;
-    height:40px;
+    width:35px;
+    height:35px;
     background:cyan;
     position:absolute;
 }
 #enemy{
-    width:40px;
-    height:40px;
+    width:35px;
+    height:35px;
     background:red;
     position:absolute;
 }
-#text{
+#goal{
+    width:40px;
+    height:40px;
+    background:lime;
+    position:absolute;
+}
+#ui{
     position:fixed;
     color:white;
-    font-size:30px;
-    top:10px;
+    font-size:20px;
     left:10px;
+    top:10px;
 }
+button{
+    position:fixed;
+    bottom:20px;
+    font-size:30px;
+}
+#left{left:20px;}
+#right{left:120px;}
+#up{right:120px;}
+#down{right:20px;}
 </style>
 </head>
 <body>
 
-<div id="text">逃げろ！！</div>
+<div id="ui">スタート→ゴールへ逃げろ！</div>
+
 <div id="player"></div>
 <div id="enemy"></div>
+<div id="goal"></div>
+
+<!-- 壁 -->
+<div class="wall" style="left:100px;top:0;width:20px;height:400px;"></div>
+<div class="wall" style="left:200px;top:200px;width:20px;height:400px;"></div>
+<div class="wall" style="left:300px;top:0;width:20px;height:400px;"></div>
+<div class="wall" style="left:400px;top:200px;width:20px;height:400px;"></div>
+
+<button id="left">←</button>
+<button id="right">→</button>
+<button id="up">↑</button>
+<button id="down">↓</button>
 
 <script>
 let player = document.getElementById("player");
 let enemy = document.getElementById("enemy");
+let goal = document.getElementById("goal");
 
-let px = 100;
-let py = 100;
+let px = 20;
+let py = 20;
 
-let ex = 400;
-let ey = 300;
+let ex = 450;
+let ey = 350;
 
-let speed = 6;
+goal.style.left = "500px";
+goal.style.top = "50px";
+
+let speed = 5;
 let enemySpeed = 2;
 
-let keys = {};
+let walls = document.querySelectorAll(".wall");
 
-document.addEventListener("keydown", e => keys[e.key] = true);
-document.addEventListener("keyup", e => keys[e.key] = false);
+function hitWall(x,y){
+    for(let w of walls){
+        let r = w.getBoundingClientRect();
+        if(x < r.right && x+35 > r.left && y < r.bottom && y+35 > r.top){
+            return true;
+        }
+    }
+    return false;
+}
+
+function move(dx,dy){
+    if(!hitWall(px+dx,py)) px += dx;
+    if(!hitWall(px,py+dy)) py += dy;
+}
+
+document.getElementById("left").onclick=()=>move(-speed,0);
+document.getElementById("right").onclick=()=>move(speed,0);
+document.getElementById("up").onclick=()=>move(0,-speed);
+document.getElementById("down").onclick=()=>move(0,speed);
 
 function game(){
-    if(keys["ArrowUp"]) py -= speed;
-    if(keys["ArrowDown"]) py += speed;
-    if(keys["ArrowLeft"]) px -= speed;
-    if(keys["ArrowRight"]) px += speed;
-
     let dx = px - ex;
     let dy = py - ey;
     let dist = Math.sqrt(dx*dx + dy*dy);
 
-    ex += dx / dist * enemySpeed;
-    ey += dy / dist * enemySpeed;
+    ex += dx/dist * enemySpeed;
+    ey += dy/dist * enemySpeed;
 
     player.style.left = px + "px";
     player.style.top = py + "px";
     enemy.style.left = ex + "px";
     enemy.style.top = ey + "px";
 
-    if(dist < 40){
+    let g = goal.getBoundingClientRect();
+    if(px < g.right && px+35 > g.left && py < g.bottom && py+35 > g.top){
+        alert("クリア！！！");
+        location.reload();
+    }
+
+    if(dist < 30){
         alert("捕まった！");
         location.reload();
     }
 
     requestAnimationFrame(game);
 }
-
 game();
 </script>
 
 </body>
 </html>
+
