@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>鬼ごっこゲーム</title>
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:#222;
+}
+#player{
+    width:40px;
+    height:40px;
+    background:cyan;
+    position:absolute;
+}
+#enemy{
+    width:40px;
+    height:40px;
+    background:red;
+    position:absolute;
+}
+#text{
+    position:fixed;
+    color:white;
+    font-size:30px;
+    top:10px;
+    left:10px;
+}
+</style>
+</head>
+<body>
+
+<div id="text">逃げろ！！</div>
+<div id="player"></div>
+<div id="enemy"></div>
+
+<script>
+let player = document.getElementById("player");
+let enemy = document.getElementById("enemy");
+
+let px = 100;
+let py = 100;
+
+let ex = 400;
+let ey = 300;
+
+let speed = 6;
+let enemySpeed = 2;
+
+let keys = {};
+
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+function game(){
+    if(keys["ArrowUp"]) py -= speed;
+    if(keys["ArrowDown"]) py += speed;
+    if(keys["ArrowLeft"]) px -= speed;
+    if(keys["ArrowRight"]) px += speed;
+
+    let dx = px - ex;
+    let dy = py - ey;
+    let dist = Math.sqrt(dx*dx + dy*dy);
+
+    ex += dx / dist * enemySpeed;
+    ey += dy / dist * enemySpeed;
+
+    player.style.left = px + "px";
+    player.style.top = py + "px";
+    enemy.style.left = ex + "px";
+    enemy.style.top = ey + "px";
+
+    if(dist < 40){
+        alert("捕まった！");
+        location.reload();
+    }
+
+    requestAnimationFrame(game);
+}
+
+game();
+</script>
+
+</body>
+</html>
